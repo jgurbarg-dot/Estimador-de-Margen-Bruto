@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 try:
@@ -38,19 +37,19 @@ else:
 # Definir datos estándar para las rutas conocidas
 rutas = {
     "Biodiesel con Metanol": {
-        "ecuacion": r"C_3H_5(OOCR)_3 + 3 CH_3OH ightleftharpoons 3 R-COOCH_3 + C_3H_5(OH)_3",
+        "ecuacion": r"C_3H_5(OOCR)_3 + 3 CH_3OH \rightleftharpoons 3 R-COOCH_3 + C_3H_5(OH)_3",
         "reactivos": [{"nombre": "Aceite de Soja", "pm": 874.0, "moles": 1}, {"nombre": "Metanol", "pm": 32.0, "moles": 3}],
         "productos": [{"nombre": "Biodiesel", "pm": 292.67, "moles": 3}, {"nombre": "Glicerina", "pm": 92.0, "moles": 1}],
         "producto_principal": "Biodiesel"
     },
     "Biodiesel con Etanol": {
-        "ecuacion": r"C_3H_5(OOCR)_3 + 3 C_2H_5OH ightleftharpoons 3 R-COOC_2H_5 + C_3H_5(OH)_3",
+        "ecuacion": r"C_3H_5(OOCR)_3 + 3 C_2H_5OH \rightleftharpoons 3 R-COOC_2H_5 + C_3H_5(OH)_3",
         "reactivos": [{"nombre": "Aceite de Soja", "pm": 874.0, "moles": 1}, {"nombre": "Etanol", "pm": 46.07, "moles": 3}],
         "productos": [{"nombre": "Biodiesel", "pm": 306.667, "moles": 3}, {"nombre": "Glicerina", "pm": 92.0, "moles": 1}],
         "producto_principal": "Biodiesel"
     },
     "Biodiesel con Acetato de Metilo": {
-        "ecuacion": r"C_3H_5(OOCR)_3 + 3 CH_3COOCH_3 ightleftharpoons 3 R-COOCH_3 + C_3H_5(OOCCH_3)_3",
+        "ecuacion": r"C_3H_5(OOCR)_3 + 3 CH_3COOCH_3 \rightleftharpoons 3 R-COOCH_3 + C_3H_5(OOCCH_3)_3",
         "reactivos": [{"nombre": "Aceite de Soja", "pm": 874.0, "moles": 1}, {"nombre": "Acetato de Metilo", "pm": 74.08, "moles": 3}],
         "productos": [{"nombre": "Biodiesel", "pm": 292.67, "moles": 3}, {"nombre": "Triacetina", "pm": 218.21, "moles": 1}],
         "producto_principal": "Biodiesel"
@@ -63,7 +62,6 @@ if proceso != "Otro":
     datos_proceso = rutas[proceso]
     
     st.subheader("1. Diagrama de Bloques y Reacción")
-    # Mejorar la imagen de entrada y salida
     reac_nombres = "<br>".join([r['nombre'] for r in datos_proceso['reactivos']])
     prod_nombres = "<br>".join([p['nombre'] for p in datos_proceso['productos']])
     
@@ -110,24 +108,21 @@ else:
             reac_set, prod_set = balance_stoichiometry(set(reactivos_formulas), set(productos_formulas))
             st.success("¡Ecuación balanceada con éxito!")
             
-            # Construir datos_proceso
             datos_proceso = {
                 "reactivos": [],
                 "productos": [],
-                "producto_principal": productos_formulas[0] # Por defecto el primero
+                "producto_principal": productos_formulas[0]
             }
             
             ecuacion_str = ""
-            # Procesar reactivos
             for idx, (f, moles) in enumerate(reac_set.items()):
                 sub = Substance.from_formula(f)
                 datos_proceso["reactivos"].append({"nombre": f, "pm": sub.mass, "moles": moles})
                 ecuacion_str += f"{moles} {f} "
                 if idx < len(reac_set) - 1: ecuacion_str += "+ "
                 
-            ecuacion_str += "\rightarrow "
+            ecuacion_str += r"\rightarrow "
             
-            # Procesar productos
             for idx, (f, moles) in enumerate(prod_set.items()):
                 sub = Substance.from_formula(f)
                 datos_proceso["productos"].append({"nombre": f, "pm": sub.mass, "moles": moles})
@@ -151,7 +146,6 @@ if datos_proceso is not None:
     st.markdown("---")
     st.subheader("2. Estequiometría y Consumo Específico")
     
-    # Identificar producto principal para el calculo de consumo especifico
     prod_princ = next(p for p in datos_proceso['productos'] if p['nombre'] == datos_proceso['producto_principal'])
     pm_base = prod_princ['pm']
     moles_base = prod_princ['moles']
@@ -225,8 +219,7 @@ if datos_proceso is not None:
                     factor = st.slider(f"Factor de venta {p['nombre']} (Ajuste de mercado)", 0.0, 1.0, 1.0, key=f"factor_{p['nombre']}")
                     factores[p['nombre']] = factor
 
-    # Calculo del margen
-    ingresos = precios[prod_princ['nombre']] # Ingreso por tonelada de producto principal
+    ingresos = precios[prod_princ['nombre']]
     costos_reactivos = 0.0
     ingresos_sub = 0.0
     costos_residuos = 0.0
